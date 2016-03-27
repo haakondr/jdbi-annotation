@@ -2,6 +2,8 @@ package me.shakiba.jdbi.annotation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 abstract class AnnoType {
@@ -84,11 +86,24 @@ abstract class AnnoType {
 
         @Override
         public Object getValue(ResultSet rs, String name) throws SQLException {
-            return rs.getDate(name);
+            return rs.getDate(name).toLocalDate();
         }
     };
+
+    public static AnnoType Timestamp = new AnnoType() {
+        @Override
+        public boolean isAssignableFrom(Class<?> type) {
+            return LocalDateTime.class.isAssignableFrom(type);
+        }
+
+        @Override
+        public Object getValue(ResultSet rs, String name) throws SQLException {
+            return rs.getTimestamp(name).toLocalDateTime();
+        }
+    };
+
     public static AnnoType[] primitives = { String, Long, Int, Double, Float,
-            Boolean, Date };
+            Boolean, Date, Timestamp };
 
     public static AnnoType of(Class<?> clazz) throws IllegalArgumentException {
         for (AnnoType annoType : AnnoType.primitives) {
